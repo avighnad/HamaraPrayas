@@ -59,6 +59,7 @@ struct BloodBankListView: View {
                     }
                     .listStyle(PlainListStyle())
                     .refreshable {
+                        HapticManager.shared.lightImpact()
                         viewModel.refreshBloodBanks()
                     }
                 }
@@ -129,10 +130,29 @@ struct BloodBankListView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     HStack(alignment: .top) {
                         VStack(alignment: .leading, spacing: 6) {
-                            Text(bloodBank.name)
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.primary)
+                            HStack(spacing: 6) {
+                                Text(bloodBank.name)
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+                                
+                                // Verified badge
+                                if bloodBank.isVerified {
+                                    HStack(spacing: 2) {
+                                        Image(systemName: "checkmark.seal.fill")
+                                            .font(.caption)
+                                            .foregroundColor(.blue)
+                                        Text("Verified")
+                                            .font(.caption2)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.blue)
+                                    }
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.blue.opacity(0.1))
+                                    .cornerRadius(8)
+                                }
+                            }
                             
                             Text(bloodBank.address)
                                 .font(.subheadline)
@@ -385,6 +405,12 @@ struct BloodBankInfoView: View {
                             icon: "phone.fill",
                             title: "Direct Contact",
                             description: "Tap on any blood bank to see contact information and call them directly to confirm availability before visiting."
+                        )
+                        
+                        InfoSection(
+                            icon: "checkmark.seal.fill",
+                            title: "Verified Blood Banks",
+                            description: "Look for the blue 'Verified' badge! These are confirmed blood banks in our database. Other results are from OpenStreetMap and may include hospitals with blood bank facilities."
                         )
                         
                         InfoSection(

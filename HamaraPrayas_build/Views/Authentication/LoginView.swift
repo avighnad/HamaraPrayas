@@ -110,6 +110,7 @@ struct LoginView: View {
                             
                             // Login Button
                             Button(action: {
+                                HapticManager.shared.mediumImpact()
                                 Task {
                                     await authService.login(email: email, password: password)
                                 }
@@ -169,6 +170,7 @@ struct LoginView: View {
                         // ✅ Google Sign-In Button (UIKit wrapped)
                         // Privacy Policy and Terms of Service will be shown during Google Sign-In
                         GoogleSignInButton {
+                            HapticManager.shared.mediumImpact()
                             Task {
                                 await authService.signInWithGoogle()
                             }
@@ -186,6 +188,7 @@ struct LoginView: View {
                         
                         // Register Button
                         Button(action: {
+                            HapticManager.shared.lightImpact()
                             showingRegistration = true
                         }) {
                             HStack {

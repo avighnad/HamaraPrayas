@@ -1,208 +1,250 @@
+//
+//  PlacesService.swift
+//  HamaraPrayas_build
+//
+//  Blood Bank search service - prioritizes verified blood banks from Firebase,
+//  then supplements with OpenStreetMap data for actual blood banks.
+//
+
 import Foundation
 import CoreLocation
+import FirebaseFirestore
 
 class PlacesService: ObservableObject {
     @Published var nearbyBloodBanks: [BloodBank] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
     
+    private let db = Firestore.firestore()
+    
+    // MARK: - Main Search Function
     func searchNearbyBloodBanks(location: CLLocationCoordinate2D, radius: Double = 50000) {
         isLoading = true
         errorMessage = nil
         
-        print("🔍 NEW API CALL: Searching for hospitals at location: \(location.latitude), \(location.longitude)")
-        print("📡 Making fresh request to OpenStreetMap API...")
+        print("🔍 Searching for blood banks at location: \(location.latitude), \(location.longitude)")
         
-        // Enhanced OpenStreetMap Overpass API query for hospitals and medical facilities
-        // First try with radius, then try broader city search
+        // First, fetch verified blood banks from our Firebase database
+        fetchVerifiedBloodBanks(location: location) { [weak self] verifiedBanks in
+            // Then, fetch from OpenStreetMap for additional results
+            self?.fetchOSMBloodBanks(location: location, radius: radius) { osmBanks in
+                DispatchQueue.main.async {
+                    // Combine results: verified first, then OSM results
+                    var allBanks = verifiedBanks
+                    
+                    // Add OSM banks that aren't duplicates of verified ones
+                    for osmBank in osmBanks {
+                        let isDuplicate = verifiedBanks.contains { verified in
+                            // Check if same location (within ~100m) or same name
+                            let distance = self?.calculateDistance(from: verified.location, to: osmBank.location) ?? 0
+                            return distance < 0.1 || verified.name.lowercased() == osmBank.name.lowercased()
+                        }
+                        if !isDuplicate {
+                            allBanks.append(osmBank)
+                        }
+                    }
+                    
+                    // Sort by distance
+                    allBanks.sort { ($0.distance ?? Double.greatestFiniteMagnitude) < ($1.distance ?? Double.greatestFiniteMagnitude) }
+                    
+                    self?.nearbyBloodBanks = allBanks
+                    self?.isLoading = false
+                    
+                    if allBanks.isEmpty {
+                        self?.errorMessage = "No blood banks found in your area"
+                    }
+                    
+                    print("✅ Total blood banks found: \(allBanks.count) (\(verifiedBanks.count) verified, \(osmBanks.count) from OSM)")
+                }
+            }
+        }
+    }
+    
+    // MARK: - Fetch Verified Blood Banks from Firebase
+    private func fetchVerifiedBloodBanks(location: CLLocationCoordinate2D, completion: @escaping ([BloodBank]) -> Void) {
+        print("📦 Fetching verified blood banks from Firebase...")
+        
+        db.collection("verified_blood_banks").getDocuments { [weak self] snapshot, error in
+            if let error = error {
+                print("❌ Error fetching verified blood banks: \(error.localizedDescription)")
+                completion([])
+                return
+            }
+            
+            guard let documents = snapshot?.documents else {
+                print("📭 No verified blood banks in database")
+                completion([])
+                return
+            }
+            
+            let bloodBanks = documents.compactMap { doc -> BloodBank? in
+                let data = doc.data()
+                
+                guard let name = data["name"] as? String,
+                      let lat = data["latitude"] as? Double,
+                      let lon = data["longitude"] as? Double else {
+                    return nil
+                }
+                
+                let bankLocation = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+                
+                // Calculate distance and filter by radius (100km max)
+                let distance = self?.calculateDistance(from: location, to: bankLocation) ?? 0
+                guard distance <= 100 else { return nil }
+                
+                // Parse blood inventory if available
+                var inventory: [BloodType: Int] = [:]
+                if let inventoryData = data["bloodInventory"] as? [String: Int] {
+                    for (key, value) in inventoryData {
+                        if let bloodType = BloodType(rawValue: key) {
+                            inventory[bloodType] = value
+                        }
+                    }
+                }
+                
+                var bank = BloodBank(
+                    name: name,
+                    address: data["address"] as? String ?? "Address not available",
+                    phoneNumber: data["phoneNumber"] as? String ?? "Contact facility",
+                    email: data["email"] as? String,
+                    website: data["website"] as? String,
+                    location: bankLocation,
+                    operatingHours: data["operatingHours"] as? String ?? "Check with facility",
+                    isOpen: data["isOpen"] as? Bool ?? true,
+                    bloodInventory: inventory,
+                    rating: data["rating"] as? Double ?? 4.5,
+                    isVerified: true
+                )
+                bank.distance = distance
+                
+                return bank
+            }
+            
+            // Sort by distance
+            let sortedBanks = bloodBanks.sorted { ($0.distance ?? 0) < ($1.distance ?? 0) }
+            print("✅ Found \(sortedBanks.count) verified blood banks")
+            completion(sortedBanks)
+        }
+    }
+    
+    // MARK: - Fetch Blood Banks from OpenStreetMap
+    private func fetchOSMBloodBanks(location: CLLocationCoordinate2D, radius: Double, completion: @escaping ([BloodBank]) -> Void) {
+        print("🌐 Fetching blood banks from OpenStreetMap...")
+        
+        // IMPROVED QUERY: Search specifically for blood banks and blood donation centers
         let query = """
         [out:json][timeout:30];
         (
-          node["amenity"="hospital"](around:\(radius),\(location.latitude),\(location.longitude));
-          way["amenity"="hospital"](around:\(radius),\(location.latitude),\(location.longitude));
-          node["healthcare"="hospital"](around:\(radius),\(location.latitude),\(location.longitude));
-          way["healthcare"="hospital"](around:\(radius),\(location.latitude),\(location.longitude));
-          node["amenity"="clinic"](around:\(radius),\(location.latitude),\(location.longitude));
-          way["amenity"="clinic"](around:\(radius),\(location.latitude),\(location.longitude));
-          node["healthcare"="clinic"](around:\(radius),\(location.latitude),\(location.longitude));
-          way["healthcare"="clinic"](around:\(radius),\(location.latitude),\(location.longitude));
-          node["amenity"="doctors"](around:\(radius),\(location.latitude),\(location.longitude));
-          way["amenity"="doctors"](around:\(radius),\(location.latitude),\(location.longitude));
-          node["healthcare"="doctors"](around:\(radius),\(location.latitude),\(location.longitude));
-          way["healthcare"="doctors"](around:\(radius),\(location.latitude),\(location.longitude));
-          node["amenity"="pharmacy"](around:\(radius),\(location.latitude),\(location.longitude));
-          way["amenity"="pharmacy"](around:\(radius),\(location.latitude),\(location.longitude));
+          node["healthcare"="blood_bank"](around:\(radius),\(location.latitude),\(location.longitude));
+          way["healthcare"="blood_bank"](around:\(radius),\(location.latitude),\(location.longitude));
+          node["healthcare"="blood_donation"](around:\(radius),\(location.latitude),\(location.longitude));
+          way["healthcare"="blood_donation"](around:\(radius),\(location.latitude),\(location.longitude));
+          node["amenity"="blood_bank"](around:\(radius),\(location.latitude),\(location.longitude));
+          way["amenity"="blood_bank"](around:\(radius),\(location.latitude),\(location.longitude));
+          node["name"~"[Bb]lood.*[Bb]ank|[Bb]lood.*[Cc]enter|[Bb]lood.*[Cc]entre|Red Cross"](around:\(radius),\(location.latitude),\(location.longitude));
+          way["name"~"[Bb]lood.*[Bb]ank|[Bb]lood.*[Cc]enter|[Bb]lood.*[Cc]entre|Red Cross"](around:\(radius),\(location.latitude),\(location.longitude));
         );
         out body;
         """
-        
-        print("📡 Query: \(query)")
         
         let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let urlString = "https://overpass-api.de/api/interpreter?data=\(encodedQuery)"
         
-        print("🌐 URL: \(urlString)")
-        
         guard let url = URL(string: urlString) else {
-            DispatchQueue.main.async {
-                self.isLoading = false
-                self.errorMessage = "Invalid URL"
-                print("❌ Invalid URL")
-            }
+            print("❌ Invalid OSM URL")
+            completion([])
             return
         }
         
-        print("📡 Making network request...")
-        
-        // Add timeout
         let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
-            DispatchQueue.main.async {
-                self?.isLoading = false
+            if let error = error {
+                print("❌ OSM network error: \(error.localizedDescription)")
+                self?.fetchHospitalsAsFallback(location: location, radius: radius, completion: completion)
+                return
+            }
+            
+            guard let data = data else {
+                print("❌ No OSM data received")
+                self?.fetchHospitalsAsFallback(location: location, radius: radius, completion: completion)
+                return
+            }
+            
+            do {
+                let overpassResponse = try JSONDecoder().decode(OverpassResponse.self, from: data)
+                print("🔍 OSM returned \(overpassResponse.elements.count) blood bank elements")
                 
-                if let error = error {
-                    print("❌ Network error: \(error.localizedDescription)")
-                    self?.nearbyBloodBanks = []
-                    self?.errorMessage = "Unable to load blood banks - check your internet connection"
-                    return
+                let bloodBanks = overpassResponse.elements.compactMap { element -> BloodBank? in
+                    self?.convertOverpassElementToBloodBank(element, userLocation: location, isVerified: false)
                 }
                 
-                if let httpResponse = response as? HTTPURLResponse {
-                    print("📊 HTTP Status: \(httpResponse.statusCode)")
-                    
-                    // Handle server errors
-                    if httpResponse.statusCode >= 500 {
-                        print("❌ Server error: \(httpResponse.statusCode)")
-                        self?.nearbyBloodBanks = []
-                        self?.errorMessage = "Unable to load blood banks - server temporarily unavailable"
-                        return
+                if bloodBanks.isEmpty {
+                    print("⚠️ No blood banks found in OSM, trying hospital fallback...")
+                    self?.fetchHospitalsAsFallback(location: location, radius: radius, completion: completion)
+                } else {
+                    DispatchQueue.main.async {
+                        completion(bloodBanks)
                     }
                 }
-                
-                guard let data = data else {
-                    print("❌ No data received")
-                    self?.nearbyBloodBanks = []
-                    self?.errorMessage = "No blood banks found in your area"
-                    return
-                }
-                
-                print("📦 Received \(data.count) bytes of data")
-                if let responseString = String(data: data, encoding: .utf8) {
-                    print("📄 Response: \(responseString.prefix(500))...")
-                }
-                
-                                 do {
-                     let overpassResponse = try JSONDecoder().decode(OverpassResponse.self, from: data)
-                     print("🔍 Processing \(overpassResponse.elements.count) elements from OpenStreetMap")
-                     
-                     let bloodBanks = overpassResponse.elements.compactMap { element in
-                         self?.convertOverpassElementToBloodBank(element)
-                     }
-                     
-                     print("✅ Successfully converted \(bloodBanks.count) elements to BloodBank objects")
-                     
-                     if bloodBanks.isEmpty {
-                         // No hospitals found in OpenStreetMap, try broader search
-                         print("No hospitals found in OpenStreetMap, trying broader search...")
-                         self?.searchBroaderArea(location: location)
-                     } else {
-                         self?.nearbyBloodBanks = bloodBanks
-                         print("Found \(bloodBanks.count) hospitals from OpenStreetMap")
-                     }
-                                  } catch {
-                     print("❌ Error parsing OpenStreetMap data: \(error.localizedDescription)")
-                     self?.nearbyBloodBanks = []
-                     self?.errorMessage = "No blood banks found in your area"
-                 }
-             }
-         }
-         
-         task.resume()
-         
-         // Add timeout fallback
-         DispatchQueue.main.asyncAfter(deadline: .now() + 10.0) {
-             if self.isLoading {
-                 print("⏰ Request timed out")
-                 self.isLoading = false
-                 self.nearbyBloodBanks = []
-                 self.errorMessage = "Request timed out - no blood banks found"
-             }
-         }
+            } catch {
+                print("❌ Error parsing OSM data: \(error.localizedDescription)")
+                self?.fetchHospitalsAsFallback(location: location, radius: radius, completion: completion)
+            }
+        }
+        
+        task.resume()
     }
     
-    private func searchBroaderArea(location: CLLocationCoordinate2D) {
-        print("🔍 Searching broader area (100km radius)...")
+    // MARK: - Fallback: Search for Major Hospitals (likely to have blood banks)
+    private func fetchHospitalsAsFallback(location: CLLocationCoordinate2D, radius: Double, completion: @escaping ([BloodBank]) -> Void) {
+        print("🏥 Falling back to major hospitals search...")
         
-        // Much broader search - 100km radius
-        let broaderQuery = """
+        // Search for major hospitals that likely have blood banks
+        let query = """
         [out:json][timeout:30];
         (
-          node["amenity"="hospital"](around:100000,\(location.latitude),\(location.longitude));
-          way["amenity"="hospital"](around:100000,\(location.latitude),\(location.longitude));
-          node["healthcare"="hospital"](around:100000,\(location.latitude),\(location.longitude));
-          way["healthcare"="hospital"](around:100000,\(location.latitude),\(location.longitude));
-          node["amenity"="clinic"](around:100000,\(location.latitude),\(location.longitude));
-          way["amenity"="clinic"](around:100000,\(location.latitude),\(location.longitude));
-          node["healthcare"="clinic"](around:100000,\(location.latitude),\(location.longitude));
-          way["healthcare"="clinic"](around:100000,\(location.latitude),\(location.longitude));
-          node["amenity"="doctors"](around:100000,\(location.latitude),\(location.longitude));
-          way["amenity"="doctors"](around:100000,\(location.latitude),\(location.longitude));
-          node["healthcare"="doctors"](around:100000,\(location.latitude),\(location.longitude));
-          way["healthcare"="doctors"](around:100000,\(location.latitude),\(location.longitude));
+          node["amenity"="hospital"]["name"](around:\(radius),\(location.latitude),\(location.longitude));
+          way["amenity"="hospital"]["name"](around:\(radius),\(location.latitude),\(location.longitude));
         );
         out body;
         """
         
-        let encodedQuery = broaderQuery.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+        let encodedQuery = query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
         let urlString = "https://overpass-api.de/api/interpreter?data=\(encodedQuery)"
         
         guard let url = URL(string: urlString) else {
-            print("❌ Invalid broader search URL")
-            self.nearbyBloodBanks = []
-            self.errorMessage = "No blood banks found in the area"
+            DispatchQueue.main.async {
+                completion([])
+            }
             return
         }
         
         let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    print("❌ Broader search network error: \(error.localizedDescription)")
-                    self?.nearbyBloodBanks = []
-                    self?.errorMessage = "No blood banks found in the area"
-                    return
+            guard let data = data, error == nil else {
+                DispatchQueue.main.async {
+                    completion([])
                 }
+                return
+            }
+            
+            do {
+                let overpassResponse = try JSONDecoder().decode(OverpassResponse.self, from: data)
                 
-                if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode >= 500 {
-                    print("❌ Broader search server error: \(httpResponse.statusCode)")
-                    self?.nearbyBloodBanks = []
-                    self?.errorMessage = "No blood banks found in the area"
-                    return
-                }
-                
-                guard let data = data else {
-                    print("❌ No data from broader search")
-                    self?.nearbyBloodBanks = []
-                    self?.errorMessage = "No blood banks found in the area"
-                    return
-                }
-                
-                do {
-                    let overpassResponse = try JSONDecoder().decode(OverpassResponse.self, from: data)
-                    let bloodBanks = overpassResponse.elements.compactMap { element in
-                        self?.convertOverpassElementToBloodBank(element)
+                // Only include named hospitals
+                let bloodBanks = overpassResponse.elements.compactMap { element -> BloodBank? in
+                    guard element.tags?.amenity == "hospital",
+                          element.tags?.name != nil else {
+                        return nil
                     }
-                    
-                    if bloodBanks.isEmpty {
-                        print("No hospitals found even in broader area")
-                        self?.nearbyBloodBanks = []
-                        self?.errorMessage = "No blood banks found in the area"
-                    } else {
-                        print("Found \(bloodBanks.count) hospitals in broader area")
-                        self?.nearbyBloodBanks = bloodBanks
-                    }
-                } catch {
-                    print("❌ Error parsing broader search data: \(error.localizedDescription)")
-                    self?.nearbyBloodBanks = []
-                    self?.errorMessage = "No blood banks found in the area"
+                    return self?.convertOverpassElementToBloodBank(element, userLocation: location, isVerified: false)
+                }
+                
+                print("🏥 Found \(bloodBanks.count) hospitals as fallback")
+                DispatchQueue.main.async {
+                    completion(bloodBanks)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion([])
                 }
             }
         }
@@ -210,45 +252,48 @@ class PlacesService: ObservableObject {
         task.resume()
     }
     
-    
-    private func convertOverpassElementToBloodBank(_ element: OverpassElement) -> BloodBank? {
-        guard let lat = element.lat, let lon = element.lon else { 
+    // MARK: - Convert OSM Element to BloodBank
+    private func convertOverpassElementToBloodBank(_ element: OverpassElement, userLocation: CLLocationCoordinate2D, isVerified: Bool) -> BloodBank? {
+        guard let lat = element.lat, let lon = element.lon else {
             print("❌ Element missing lat/lon: \(element.id)")
-            return nil 
+            return nil
         }
         
-        let name = element.tags?.name ?? element.tags?.operator_name ?? "Medical Facility"
-        
-        // Build full address
+        let name = element.tags?.name ?? element.tags?.operator_name ?? "Blood Bank"
         let address = buildFullAddress(from: element.tags)
+        let phone = element.tags?.phone ?? element.tags?.contact_phone ?? "Contact facility directly"
         
-        // Get phone number - try multiple sources
-        let phone = element.tags?.phone ?? 
-                   element.tags?.contact_phone ?? 
-                   "Contact facility directly"
+        // Determine facility type and format display name
+        let facilityType = element.tags?.healthcare ?? element.tags?.amenity ?? "blood_bank"
+        let displayName = formatDisplayName(name: name, facilityType: facilityType)
         
-        // Determine facility type
-        let facilityType = element.tags?.amenity ?? "medical"
-        let displayName = getDisplayName(name: name, facilityType: facilityType)
+        let bankLocation = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+        let distance = calculateDistance(from: userLocation, to: bankLocation)
         
-        // Generate a realistic rating based on facility type
-        let rating = generateRating(for: facilityType)
-        
-        let bloodBank = BloodBank(
+        var bloodBank = BloodBank(
             name: displayName,
             address: address,
             phoneNumber: phone,
             email: element.tags?.email,
             website: element.tags?.website,
-            location: CLLocationCoordinate2D(latitude: lat, longitude: lon),
+            location: bankLocation,
             operatingHours: element.tags?.opening_hours ?? "Check with facility",
             isOpen: true,
             bloodInventory: [:],
-            rating: rating
+            rating: isVerified ? 4.5 : Double.random(in: 3.5...4.5),
+            isVerified: isVerified
         )
+        bloodBank.distance = distance
         
         print("✅ Created BloodBank: \(displayName) at \(lat), \(lon)")
         return bloodBank
+    }
+    
+    // MARK: - Helper Methods
+    private func calculateDistance(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D) -> Double {
+        let fromLocation = CLLocation(latitude: from.latitude, longitude: from.longitude)
+        let toLocation = CLLocation(latitude: to.latitude, longitude: to.longitude)
+        return fromLocation.distance(from: toLocation) / 1000 // Convert to km
     }
     
     private func buildFullAddress(from tags: OverpassTags?) -> String {
@@ -259,15 +304,12 @@ class PlacesService: ObservableObject {
         if let housenumber = tags.addr_housenumber {
             addressComponents.append(housenumber)
         }
-        
         if let street = tags.addr_street {
             addressComponents.append(street)
         }
-        
         if let city = tags.addr_city {
             addressComponents.append(city)
         }
-        
         if let postcode = tags.addr_postcode {
             addressComponents.append(postcode)
         }
@@ -279,36 +321,13 @@ class PlacesService: ObservableObject {
         return addressComponents.joined(separator: ", ")
     }
     
-    private func generateRating(for facilityType: String) -> Double {
-        switch facilityType {
-        case "hospital":
-            return Double.random(in: 3.8...4.8) // Hospitals generally have good ratings
-        case "clinic":
-            return Double.random(in: 3.5...4.5) // Clinics have decent ratings
-        case "doctors":
-            return Double.random(in: 3.0...4.2) // Medical offices vary
-        case "emergency":
-            return Double.random(in: 3.8...4.6) // Emergency centers are usually well-rated
-        default:
-            return Double.random(in: 3.0...4.0)
+    private func formatDisplayName(name: String, facilityType: String) -> String {
+        // If it's a hospital being used as fallback, indicate it may have a blood bank
+        if facilityType == "hospital" && !name.lowercased().contains("blood") {
+            return "\(name) (Blood Bank)"
         }
+        return name
     }
-    
-    private func getDisplayName(name: String, facilityType: String) -> String {
-        switch facilityType {
-        case "hospital":
-            return name.contains("Hospital") ? name : "\(name) Hospital"
-        case "clinic":
-            return name.contains("Clinic") ? name : "\(name) Medical Clinic"
-        case "doctors":
-            return name.contains("Doctor") ? name : "\(name) Medical Office"
-        case "emergency":
-            return name.contains("Emergency") ? name : "\(name) Emergency Center"
-        default:
-            return name
-        }
-    }
-    
 }
 
 // MARK: - OpenStreetMap Data Models
@@ -342,7 +361,20 @@ struct OverpassTags: Codable {
     let emergency: String?
     
     enum CodingKeys: String, CodingKey {
-        case name, operator_name, addr_street, addr_full, addr_housenumber, addr_postcode, addr_city
-        case phone, contact_phone, email, website, opening_hours, amenity, healthcare, emergency
+        case name
+        case operator_name = "operator"
+        case addr_street = "addr:street"
+        case addr_full = "addr:full"
+        case addr_housenumber = "addr:housenumber"
+        case addr_postcode = "addr:postcode"
+        case addr_city = "addr:city"
+        case phone
+        case contact_phone = "contact:phone"
+        case email
+        case website
+        case opening_hours
+        case amenity
+        case healthcare
+        case emergency
     }
 }

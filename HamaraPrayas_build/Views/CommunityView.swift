@@ -28,6 +28,7 @@ struct CommunityView: View {
                     }
                     .listStyle(PlainListStyle())
                     .refreshable {
+                        HapticManager.shared.lightImpact()
                         viewModel.setupHelpRequestsListener()
                     }
                     .sheet(item: $selectedHelpRequest) { request in
@@ -210,7 +211,10 @@ struct HelpRequestCard: View {
                 // Help button - only show if not user's own request
                 if let currentUserId = Auth.auth().currentUser?.uid,
                    helpRequest.requesterUserId != currentUserId {
-                    Button(action: onOfferHelp) {
+                    Button(action: {
+                        HapticManager.shared.success()
+                        onOfferHelp()
+                    }) {
                         HStack {
                             Image(systemName: "heart.fill")
                                 .foregroundColor(.white)

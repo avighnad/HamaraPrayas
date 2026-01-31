@@ -152,7 +152,10 @@ struct BloodRequestFormView: View {
                 }
                 
                 Section {
-                    Button(action: submitRequest) {
+                    Button(action: {
+                        HapticManager.shared.heavyImpact()
+                        submitRequest()
+                    }) {
                         HStack {
                             Image(systemName: "heart.fill")
                                 .foregroundColor(.red)
@@ -214,6 +217,7 @@ struct BloodRequestFormView: View {
         Task {
             await viewModel.submitBloodRequest(request)
             await MainActor.run {
+                HapticManager.shared.success()
                 alertMessage = "Blood request submitted successfully! We'll notify nearby blood banks."
                 showingAlert = true
             }

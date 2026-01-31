@@ -96,6 +96,7 @@ struct OnboardingView: View {
                 HStack(spacing: 20) {
                     if currentPage > 0 {
                         Button(action: {
+                            HapticManager.shared.lightImpact()
                             withAnimation {
                                 currentPage -= 1
                             }
@@ -117,10 +118,12 @@ struct OnboardingView: View {
                     
                     Button(action: {
                         if currentPage < pages.count - 1 {
+                            HapticManager.shared.lightImpact()
                             withAnimation {
                                 currentPage += 1
                             }
                         } else {
+                            HapticManager.shared.success()
                             completeOnboarding()
                         }
                     }) {

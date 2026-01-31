@@ -213,6 +213,7 @@ struct RegistrationView: View {
                         
                         // Register Button
                         Button(action: {
+                            HapticManager.shared.mediumImpact()
                             Task {
                                 let registrationData = RegistrationData(
                                     email: email,
@@ -229,6 +230,7 @@ struct RegistrationView: View {
                                 await authService.register(data: registrationData)
                                 
                                 if authService.isAuthenticated {
+                                    HapticManager.shared.celebration()
                                     dismiss()
                                 }
                             }

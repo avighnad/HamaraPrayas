@@ -3,17 +3,19 @@ import FirebaseAuth
 
 struct MainTabView: View {
     @StateObject private var viewModel = BloodBankViewModel()
+    @State private var selectedTab = 0
     
     var body: some View {
         ZStack(alignment: .top) {
             VStack(spacing: 0) {
-                TabView {
+                TabView(selection: $selectedTab) {
                     // Blood Banks Tab - First tab users see
                     BloodBankListView(viewModel: viewModel)
                         .tabItem {
                             Image(systemName: "building.2")
                             Text("Blood Banks")
                         }
+                        .tag(0)
                     
                     // Live Updates Tab
                     LiveUpdatesView()
@@ -21,6 +23,7 @@ struct MainTabView: View {
                             Image(systemName: "photo.on.rectangle.angled")
                             Text("Live")
                         }
+                        .tag(1)
                     
                     // Blood Requests Tab
                     BloodRequestsView(viewModel: viewModel)
@@ -28,6 +31,7 @@ struct MainTabView: View {
                             Image(systemName: "heart.text.square")
                             Text("My Requests")
                         }
+                        .tag(2)
                     
                     // Community Tab
                     CommunityView(viewModel: viewModel)
@@ -35,6 +39,7 @@ struct MainTabView: View {
                             Image(systemName: "person.3")
                             Text("Community")
                         }
+                        .tag(3)
                     
                     // More Tab
                     MoreView(viewModel: viewModel)
@@ -42,8 +47,12 @@ struct MainTabView: View {
                             Image(systemName: "ellipsis.circle")
                             Text("More")
                         }
+                        .tag(4)
                 }
                 .accentColor(.red)
+                .onChange(of: selectedTab) { _, _ in
+                    HapticManager.shared.selectionChanged()
+                }
                 .onAppear {
                     // Delay heavy operations to prevent UI freezing
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
@@ -141,6 +150,7 @@ struct EmergencyView: View {
                 // Quick Actions
                 VStack(spacing: 20) {
                     Button(action: {
+                        HapticManager.shared.emergency()
                         showingBloodRequestForm = true
                     }) {
                         HStack {

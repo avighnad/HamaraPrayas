@@ -83,10 +83,12 @@ class AuthenticationService: ObservableObject {
             loadUserFromFirestore(userId: authResult.user.uid)
             
             await MainActor.run {
+                HapticManager.shared.success()
                 isLoading = false
             }
         } catch {
             await MainActor.run {
+                HapticManager.shared.error()
                 isLoading = false
                 errorMessage = error.localizedDescription
             }

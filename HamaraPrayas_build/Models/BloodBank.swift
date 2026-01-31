@@ -14,8 +14,9 @@ struct BloodBank: Identifiable, Codable {
     var bloodInventory: [BloodType: Int]
     var rating: Double
     var distance: Double?
+    var isVerified: Bool  // NEW: Indicates if this is a verified blood bank from our database
     
-    init(name: String, address: String, phoneNumber: String, email: String? = nil, website: String? = nil, location: CLLocationCoordinate2D, operatingHours: String, isOpen: Bool = true, bloodInventory: [BloodType: Int] = [:], rating: Double = 0.0) {
+    init(name: String, address: String, phoneNumber: String, email: String? = nil, website: String? = nil, location: CLLocationCoordinate2D, operatingHours: String, isOpen: Bool = true, bloodInventory: [BloodType: Int] = [:], rating: Double = 0.0, isVerified: Bool = false) {
         self.id = UUID()
         self.name = name
         self.address = address
@@ -27,6 +28,7 @@ struct BloodBank: Identifiable, Codable {
         self.isOpen = isOpen
         self.bloodInventory = bloodInventory
         self.rating = rating
+        self.isVerified = isVerified
     }
     
     func hasBloodType(_ bloodType: BloodType, units: Int = 1) -> Bool {
@@ -51,6 +53,7 @@ struct BloodBank: Identifiable, Codable {
         case bloodInventory
         case rating
         case distance
+        case isVerified
     }
 
     init(from decoder: Decoder) throws {
@@ -71,6 +74,7 @@ struct BloodBank: Identifiable, Codable {
         })
         rating = try container.decode(Double.self, forKey: .rating)
         distance = try container.decodeIfPresent(Double.self, forKey: .distance)
+        isVerified = try container.decodeIfPresent(Bool.self, forKey: .isVerified) ?? false
     }
 
     func encode(to encoder: Encoder) throws {
@@ -88,6 +92,7 @@ struct BloodBank: Identifiable, Codable {
         try container.encode(inventoryRaw, forKey: .bloodInventory)
         try container.encode(rating, forKey: .rating)
         try container.encodeIfPresent(distance, forKey: .distance)
+        try container.encode(isVerified, forKey: .isVerified)
     }
 }
 
