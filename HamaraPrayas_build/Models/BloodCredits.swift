@@ -104,7 +104,7 @@ struct DonationRecord: Identifiable, Codable {
 }
 
 // MARK: - Badge System
-struct Badge: Identifiable, Codable {
+struct Badge: Identifiable, Codable, Equatable {
     let id: String
     let type: BadgeType
     let earnedDate: Date
@@ -113,6 +113,10 @@ struct Badge: Identifiable, Codable {
         self.id = type.rawValue
         self.type = type
         self.earnedDate = earnedDate
+    }
+    
+    static func == (lhs: Badge, rhs: Badge) -> Bool {
+        lhs.id == rhs.id && lhs.type == rhs.type
     }
 }
 

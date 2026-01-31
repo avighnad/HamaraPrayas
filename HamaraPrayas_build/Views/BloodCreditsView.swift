@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct BloodCreditsView: View {
     @StateObject private var creditsService = BloodCreditsService.shared
@@ -82,7 +83,7 @@ struct BloodCreditsView: View {
                 }
             }
             .task {
-                if let userId = authService.user?.id {
+                if let userId = Auth.auth().currentUser?.uid {
                     try? await creditsService.loadBloodProfile(for: userId)
                     try? await creditsService.loadLeaderboard()
                 }
@@ -376,7 +377,7 @@ struct BloodCreditsView: View {
                 .padding(.top, 40)
             } else {
                 ForEach(creditsService.leaderboard) { entry in
-                    LeaderboardRow(entry: entry, isCurrentUser: entry.userId == authService.user?.id)
+                    LeaderboardRow(entry: entry, isCurrentUser: entry.userId == Auth.auth().currentUser?.uid)
                 }
             }
         }
@@ -713,7 +714,7 @@ struct RecordDonationView: View {
     }
     
     private func submitDonation() {
-        guard let userId = authService.user?.id else { return }
+        guard let userId = Auth.auth().currentUser?.uid else { return }
         
         isSubmitting = true
         HapticManager.shared.mediumImpact()
