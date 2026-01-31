@@ -104,7 +104,8 @@ class PlacesService: ObservableObject {
         
         db.collection("verified_blood_banks").getDocuments { [weak self] snapshot, error in
             if let error = error {
-                print("❌ Error fetching verified blood banks: \(error.localizedDescription)")
+                // Silently handle permission errors - collection may not exist yet
+                print("ℹ️ Verified blood banks not available: \(error.localizedDescription)")
                 completion([])
                 return
             }

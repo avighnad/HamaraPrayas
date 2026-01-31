@@ -19,96 +19,91 @@ struct BloodCreditsView: View {
     @State private var showInfoSheet = false
     
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Credit Card
-                    creditCardView
-                    
-                    // Quick Stats
-                    statsGridView
-                    
-                    // Tab Selector
-                    Picker("View", selection: $selectedTab) {
-                        Text("Badges").tag(0)
-                        Text("History").tag(1)
-                        Text("Leaderboard").tag(2)
-                    }
-                    .pickerStyle(.segmented)
-                    .padding(.horizontal)
-                    
-                    // Content based on tab
-                    switch selectedTab {
-                    case 0:
-                        badgesView
-                    case 1:
-                        transactionHistoryView
-                    case 2:
-                        leaderboardView
-                    default:
-                        EmptyView()
-                    }
+        ScrollView {
+            VStack(spacing: 24) {
+                // Credit Card
+                creditCardView
+                
+                // Quick Stats
+                statsGridView
+                
+                // Tab Selector
+                Picker("View", selection: $selectedTab) {
+                    Text("Badges").tag(0)
+                    Text("History").tag(1)
+                    Text("Leaderboard").tag(2)
                 }
-                .padding(.bottom, 100)
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                
+                // Content based on tab
+                switch selectedTab {
+                case 0:
+                    badgesView
+                case 1:
+                    transactionHistoryView
+                case 2:
+                    leaderboardView
+                default:
+                    EmptyView()
+                }
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("Blood Credits")
-            .navigationBarTitleDisplayMode(.large)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack(spacing: 16) {
-                        Button {
-                            showInfoSheet = true
-                            HapticManager.shared.lightImpact()
-                        } label: {
-                            Image(systemName: "info.circle.fill")
-                                .font(.title2)
-                                .foregroundStyle(.blue)
-                        }
-                        
-                        Button {
-                            showRecordDonation = true
-                            HapticManager.shared.lightImpact()
-                        } label: {
-                            Image(systemName: "plus.circle.fill")
-                                .font(.title2)
-                                .foregroundStyle(.red)
-                        }
+            .padding(.bottom, 100)
+        }
+        .background(Color(.systemGroupedBackground))
+        .navigationTitle("Blood Credits")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                HStack(spacing: 16) {
+                    Button {
+                        showInfoSheet = true
+                        HapticManager.shared.lightImpact()
+                    } label: {
+                        Image(systemName: "info.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(.blue)
+                    }
+                    
+                    Button {
+                        showRecordDonation = true
+                        HapticManager.shared.lightImpact()
+                    } label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title2)
+                            .foregroundStyle(.red)
                     }
                 }
             }
-            .sheet(isPresented: $showRecordDonation) {
-                RecordDonationView()
-                    .environmentObject(authService)
+        }
+        .sheet(isPresented: $showRecordDonation) {
+            RecordDonationView()
+                .environmentObject(authService)
+        }
+        .sheet(isPresented: $showInfoSheet) {
+            BloodCreditsInfoView()
+        }
+        .alert("New Badge Earned! 🎉", isPresented: $showNewBadgeAlert) {
+            Button("Awesome!", role: .cancel) {
+                creditsService.clearNewBadge()
             }
-            .sheet(isPresented: $showInfoSheet) {
-                BloodCreditsInfoView()
+        } message: {
+            if let badge = creditsService.newBadgeEarned {
+                Text("You earned the '\(badge.type.title)' badge!\n\(badge.type.description)")
             }
-            .alert("New Badge Earned! 🎉", isPresented: $showNewBadgeAlert) {
-                Button("Awesome!", role: .cancel) {
-                    creditsService.clearNewBadge()
-                }
-            } message: {
-                if let badge = creditsService.newBadgeEarned {
-                    Text("You earned the '\(badge.type.title)' badge!\n\(badge.type.description)")
-                }
+        }
+        .onChange(of: creditsService.newBadgeEarned) { _, newBadge in
+            if newBadge != nil {
+                showNewBadgeAlert = true
             }
-            .onChange(of: creditsService.newBadgeEarned) { _, newBadge in
-                if newBadge != nil {
-                    showNewBadgeAlert = true
-                }
-            }
+        }
             .task {
                 if let userId = Auth.auth().currentUser?.uid {
                     try? await creditsService.loadBloodProfile(for: userId)
                     try? await creditsService.loadLeaderboard()
                 }
             }
-        }
-    }
-    
-    // MARK: - Credit Card View
-    private var creditCardView: some View {
+
         VStack(spacing: 0) {
             // Main card
             VStack(spacing: 16) {
