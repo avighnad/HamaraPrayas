@@ -16,6 +16,7 @@ struct BloodCreditsView: View {
     @State private var showRecordDonation = false
     @State private var showNewBadgeAlert = false
     @State private var animateCredits = false
+    @State private var showInfoSheet = false
     
     var body: some View {
         NavigationStack {
@@ -52,21 +53,36 @@ struct BloodCreditsView: View {
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Blood Credits")
+            .navigationBarTitleDisplayMode(.large)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        showRecordDonation = true
-                        HapticManager.shared.lightImpact()
-                    } label: {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.title2)
-                            .foregroundStyle(.red)
+                    HStack(spacing: 16) {
+                        Button {
+                            showInfoSheet = true
+                            HapticManager.shared.lightImpact()
+                        } label: {
+                            Image(systemName: "info.circle.fill")
+                                .font(.title2)
+                                .foregroundStyle(.blue)
+                        }
+                        
+                        Button {
+                            showRecordDonation = true
+                            HapticManager.shared.lightImpact()
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.title2)
+                                .foregroundStyle(.red)
+                        }
                     }
                 }
             }
             .sheet(isPresented: $showRecordDonation) {
                 RecordDonationView()
                     .environmentObject(authService)
+            }
+            .sheet(isPresented: $showInfoSheet) {
+                BloodCreditsInfoView()
             }
             .alert("New Badge Earned! 🎉", isPresented: $showNewBadgeAlert) {
                 Button("Awesome!", role: .cancel) {
@@ -146,8 +162,16 @@ struct BloodCreditsView: View {
                             .foregroundStyle(.white.opacity(0.7))
                     } else {
                         Text("Ready to donate!")
-                            .font(.caption)
-                            .foregroundStyle(.green)
+                            .font(.caption.bold())
+                            .foregroundStyle(.red)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(.white)
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color.white, lineWidth: 2)
+                            )
                     }
                 }
             }
@@ -740,6 +764,204 @@ struct RecordDonationView: View {
                 print("Error recording donation: \(error)")
             }
         }
+    }
+}
+
+// MARK: - Blood Credits Info View
+struct BloodCreditsInfoView: View {
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    // Header
+                    VStack(spacing: 12) {
+                        Image(systemName: "star.circle.fill")
+                            .font(.system(size: 60))
+                            .foregroundStyle(.red)
+                        
+                        Text("How Blood Credits Work")
+                            .font(.title.bold())
+                            .multilineTextAlignment(.center)
+                        
+                        Text("Earn rewards for saving lives through blood donation")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.top)
+                    
+                    // How to Earn Credits
+                    VStack(alignment: .leading, spacing: 16) {
+                        Label("Earning Credits", systemImage: "plus.circle.fill")
+                            .font(.headline)
+                            .foregroundStyle(.green)
+                        
+                        CreditInfoRow(icon: "drop.fill", color: .red, title: "Donate Blood", credits: "+100", description: "Record each blood donation you make")
+                        CreditInfoRow(icon: "star.fill", color: .yellow, title: "First Donation", credits: "+50", description: "Bonus for your first recorded donation")
+                        CreditInfoRow(icon: "bolt.heart.fill", color: .orange, title: "Urgent Donation", credits: "+50", description: "Extra credits for emergency donations")
+                        CreditInfoRow(icon: "flame.fill", color: .orange, title: "Streak Bonus", credits: "+25/streak", description: "Maintain regular donations (every 56-90 days)")
+                        CreditInfoRow(icon: "hand.raised.fill", color: .blue, title: "Help Community", credits: "+10", description: "Respond to blood help requests")
+                        CreditInfoRow(icon: "person.badge.plus", color: .purple, title: "Refer Friends", credits: "+30", description: "Refer new donors to the platform")
+                    }
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    
+                    // How It's Tracked
+                    VStack(alignment: .leading, spacing: 16) {
+                        Label("How We Track Donations", systemImage: "checkmark.shield.fill")
+                            .font(.headline)
+                            .foregroundStyle(.blue)
+                        
+                        VStack(alignment: .leading, spacing: 12) {
+                            InfoBullet(text: "Self-Reported: You record your donations manually using the '+' button")
+                            InfoBullet(text: "Hospital Verification: In future updates, hospitals will verify donations")
+                            InfoBullet(text: "56-Day Rule: You can only record one donation every 56 days (safe donation interval)")
+                            InfoBullet(text: "Streak Tracking: Consistent donations within 90 days maintain your streak")
+                        }
+                    }
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    
+                    // Priority Levels
+                    VStack(alignment: .leading, spacing: 16) {
+                        Label("Priority Levels", systemImage: "crown.fill")
+                            .font(.headline)
+                            .foregroundStyle(.yellow)
+                        
+                        PriorityLevelRow(level: "Standard", credits: "0+", color: .gray, benefits: "Basic access to all features")
+                        PriorityLevelRow(level: "Silver", credits: "200+", color: .gray, benefits: "Priority in request queue")
+                        PriorityLevelRow(level: "Gold", credits: "500+", color: .yellow, benefits: "Higher priority matching")
+                        PriorityLevelRow(level: "Platinum", credits: "1000+", color: .purple, benefits: "Highest priority, VIP recognition")
+                    }
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    
+                    // Lives Saved
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label("Lives Saved Calculation", systemImage: "heart.fill")
+                            .font(.headline)
+                            .foregroundStyle(.red)
+                        
+                        Text("Each blood donation can save up to 3 lives! Red blood cells, plasma, and platelets from a single donation can help multiple patients.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    
+                    // Fair Play Notice
+                    VStack(alignment: .leading, spacing: 12) {
+                        Label("Fair Play", systemImage: "hand.raised.fill")
+                            .font(.headline)
+                            .foregroundStyle(.orange)
+                        
+                        Text("Please only record legitimate donations. False entries undermine the community and the life-saving mission of blood donation. Future updates will include hospital verification.")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                }
+                .padding()
+            }
+            .background(Color(.systemGroupedBackground))
+            .navigationTitle("About Blood Credits")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct CreditInfoRow: View {
+    let icon: String
+    let color: Color
+    let title: String
+    let credits: String
+    let description: String
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(color)
+                .frame(width: 30)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                HStack {
+                    Text(title)
+                        .font(.subheadline.bold())
+                    Spacer()
+                    Text(credits)
+                        .font(.subheadline.bold())
+                        .foregroundStyle(.green)
+                }
+                Text(description)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 4)
+    }
+}
+
+struct InfoBullet: View {
+    let text: String
+    
+    var body: some View {
+        HStack(alignment: .top, spacing: 8) {
+            Image(systemName: "circle.fill")
+                .font(.system(size: 6))
+                .foregroundStyle(.blue)
+                .padding(.top, 6)
+            
+            Text(text)
+                .font(.subheadline)
+                .foregroundStyle(.primary)
+        }
+    }
+}
+
+struct PriorityLevelRow: View {
+    let level: String
+    let credits: String
+    let color: Color
+    let benefits: String
+    
+    var body: some View {
+        HStack(spacing: 12) {
+            Circle()
+                .fill(color)
+                .frame(width: 12, height: 12)
+            
+            VStack(alignment: .leading, spacing: 2) {
+                HStack {
+                    Text(level)
+                        .font(.subheadline.bold())
+                    Spacer()
+                    Text(credits)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Text(benefits)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 4)
     }
 }
 

@@ -13,21 +13,25 @@ struct ContentView: View {
     @State private var isFirebaseReady = false
     @State private var hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
     @State private var isCheckingAuth = true
+    @State private var showOnboarding = false
     
     var body: some View {
         Group {
-            if !hasCompletedOnboarding {
-                // Show onboarding for first-time users
-                OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
-            } else if isCheckingAuth {
+            if isCheckingAuth {
                 // Show splash screen while checking auth state
                 SplashScreenView()
             } else if authService.isAuthenticated {
-                MainTabView()
-                    .environmentObject(authService)
-                    .onAppear {
-                        print("🎯 MainTabView appeared - User authenticated")
-                    }
+                // User is logged in
+                if !hasCompletedOnboarding {
+                    // Show onboarding for first-time users AFTER login
+                    OnboardingView(hasCompletedOnboarding: $hasCompletedOnboarding)
+                } else {
+                    MainTabView()
+                        .environmentObject(authService)
+                        .onAppear {
+                            print("🎯 MainTabView appeared - User authenticated")
+                        }
+                }
             } else {
                 LoginView()
                     .environmentObject(authService)
