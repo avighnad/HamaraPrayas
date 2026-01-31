@@ -1,0 +1,659 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		8407ACBD2E678F0D00276808 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 8407ACBC2E678F0D00276808 /* FirebaseAnalytics */; };
+		8407ACBF2E678F0D00276808 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 8407ACBE2E678F0D00276808 /* FirebaseAuth */; };
+		8407ACC12E678F0D00276808 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 8407ACC02E678F0D00276808 /* FirebaseCore */; };
+		8407ACC32E678F0D00276808 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 8407ACC22E678F0D00276808 /* FirebaseFirestore */; };
+		8407ACCA2E6791AF00276808 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 8407ACC92E6791AF00276808 /* GoogleSignIn */; };
+		8407ACCC2E6791AF00276808 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 8407ACCB2E6791AF00276808 /* GoogleSignInSwift */; };
+		84F404342E74BD71002152B0 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 84F404332E74BD71002152B0 /* Launch Screen.storyboard */; };
+		84F404362E74C029002152B0 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 84F404352E74C029002152B0 /* FirebaseMessaging */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		841C09CF2E610A61009192C3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 841C09B92E610A5F009192C3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 841C09C02E610A5F009192C3;
+			remoteInfo = HamaraPrayas_build;
+		};
+		841C09D92E610A61009192C3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 841C09B92E610A5F009192C3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 841C09C02E610A5F009192C3;
+			remoteInfo = HamaraPrayas_build;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		841C09C12E610A5F009192C3 /* HamaraPrayas_build.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HamaraPrayas_build.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		841C09CE2E610A61009192C3 /* HamaraPrayas_buildTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HamaraPrayas_buildTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		841C09D82E610A61009192C3 /* HamaraPrayas_buildUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HamaraPrayas_buildUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		84F404332E74BD71002152B0 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		841C09C32E610A5F009192C3 /* HamaraPrayas_build */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = HamaraPrayas_build;
+			sourceTree = "<group>";
+		};
+		841C09D12E610A61009192C3 /* HamaraPrayas_buildTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = HamaraPrayas_buildTests;
+			sourceTree = "<group>";
+		};
+		841C09DB2E610A61009192C3 /* HamaraPrayas_buildUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = HamaraPrayas_buildUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		841C09BE2E610A5F009192C3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8407ACCA2E6791AF00276808 /* GoogleSignIn in Frameworks */,
+				8407ACBD2E678F0D00276808 /* FirebaseAnalytics in Frameworks */,
+				84F404362E74C029002152B0 /* FirebaseMessaging in Frameworks */,
+				8407ACC32E678F0D00276808 /* FirebaseFirestore in Frameworks */,
+				8407ACCC2E6791AF00276808 /* GoogleSignInSwift in Frameworks */,
+				8407ACC12E678F0D00276808 /* FirebaseCore in Frameworks */,
+				8407ACBF2E678F0D00276808 /* FirebaseAuth in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		841C09CB2E610A61009192C3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		841C09D52E610A61009192C3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		841C09B82E610A5F009192C3 = {
+			isa = PBXGroup;
+			children = (
+				84F404332E74BD71002152B0 /* Launch Screen.storyboard */,
+				841C09C32E610A5F009192C3 /* HamaraPrayas_build */,
+				841C09D12E610A61009192C3 /* HamaraPrayas_buildTests */,
+				841C09DB2E610A61009192C3 /* HamaraPrayas_buildUITests */,
+				841C09C22E610A5F009192C3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		841C09C22E610A5F009192C3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				841C09C12E610A5F009192C3 /* HamaraPrayas_build.app */,
+				841C09CE2E610A61009192C3 /* HamaraPrayas_buildTests.xctest */,
+				841C09D82E610A61009192C3 /* HamaraPrayas_buildUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		841C09C02E610A5F009192C3 /* HamaraPrayas_build */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 841C09E22E610A61009192C3 /* Build configuration list for PBXNativeTarget "HamaraPrayas_build" */;
+			buildPhases = (
+				841C09BD2E610A5F009192C3 /* Sources */,
+				841C09BE2E610A5F009192C3 /* Frameworks */,
+				841C09BF2E610A5F009192C3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				841C09C32E610A5F009192C3 /* HamaraPrayas_build */,
+			);
+			name = HamaraPrayas_build;
+			packageProductDependencies = (
+				8407ACBC2E678F0D00276808 /* FirebaseAnalytics */,
+				8407ACBE2E678F0D00276808 /* FirebaseAuth */,
+				8407ACC02E678F0D00276808 /* FirebaseCore */,
+				8407ACC22E678F0D00276808 /* FirebaseFirestore */,
+				8407ACC92E6791AF00276808 /* GoogleSignIn */,
+				8407ACCB2E6791AF00276808 /* GoogleSignInSwift */,
+				84F404352E74C029002152B0 /* FirebaseMessaging */,
+			);
+			productName = HamaraPrayas_build;
+			productReference = 841C09C12E610A5F009192C3 /* HamaraPrayas_build.app */;
+			productType = "com.apple.product-type.application";
+		};
+		841C09CD2E610A61009192C3 /* HamaraPrayas_buildTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 841C09E52E610A61009192C3 /* Build configuration list for PBXNativeTarget "HamaraPrayas_buildTests" */;
+			buildPhases = (
+				841C09CA2E610A61009192C3 /* Sources */,
+				841C09CB2E610A61009192C3 /* Frameworks */,
+				841C09CC2E610A61009192C3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				841C09D02E610A61009192C3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				841C09D12E610A61009192C3 /* HamaraPrayas_buildTests */,
+			);
+			name = HamaraPrayas_buildTests;
+			packageProductDependencies = (
+			);
+			productName = HamaraPrayas_buildTests;
+			productReference = 841C09CE2E610A61009192C3 /* HamaraPrayas_buildTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		841C09D72E610A61009192C3 /* HamaraPrayas_buildUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 841C09E82E610A61009192C3 /* Build configuration list for PBXNativeTarget "HamaraPrayas_buildUITests" */;
+			buildPhases = (
+				841C09D42E610A61009192C3 /* Sources */,
+				841C09D52E610A61009192C3 /* Frameworks */,
+				841C09D62E610A61009192C3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				841C09DA2E610A61009192C3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				841C09DB2E610A61009192C3 /* HamaraPrayas_buildUITests */,
+			);
+			name = HamaraPrayas_buildUITests;
+			packageProductDependencies = (
+			);
+			productName = HamaraPrayas_buildUITests;
+			productReference = 841C09D82E610A61009192C3 /* HamaraPrayas_buildUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		841C09B92E610A5F009192C3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1640;
+				LastUpgradeCheck = 1640;
+				TargetAttributes = {
+					841C09C02E610A5F009192C3 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					841C09CD2E610A61009192C3 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 841C09C02E610A5F009192C3;
+					};
+					841C09D72E610A61009192C3 = {
+						CreatedOnToolsVersion = 16.4;
+						TestTargetID = 841C09C02E610A5F009192C3;
+					};
+				};
+			};
+			buildConfigurationList = 841C09BC2E610A5F009192C3 /* Build configuration list for PBXProject "HamaraPrayas_build" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 841C09B82E610A5F009192C3;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8407ACBB2E678F0D00276808 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				8407ACC82E6791AF00276808 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 841C09C22E610A5F009192C3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				841C09C02E610A5F009192C3 /* HamaraPrayas_build */,
+				841C09CD2E610A61009192C3 /* HamaraPrayas_buildTests */,
+				841C09D72E610A61009192C3 /* HamaraPrayas_buildUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		841C09BF2E610A5F009192C3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				84F404342E74BD71002152B0 /* Launch Screen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		841C09CC2E610A61009192C3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		841C09D62E610A61009192C3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		841C09BD2E610A5F009192C3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		841C09CA2E610A61009192C3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		841C09D42E610A61009192C3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		841C09D02E610A61009192C3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 841C09C02E610A5F009192C3 /* HamaraPrayas_build */;
+			targetProxy = 841C09CF2E610A61009192C3 /* PBXContainerItemProxy */;
+		};
+		841C09DA2E610A61009192C3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 841C09C02E610A5F009192C3 /* HamaraPrayas_build */;
+			targetProxy = 841C09D92E610A61009192C3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		841C09E02E610A61009192C3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		841C09E12E610A61009192C3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		841C09E32E610A61009192C3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2W369JB8XU;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "HamaraPrayas-build-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Hamara Prayas";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This app needs access to your location to find nearby blood banks and provide accurate distance information.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app needs access to your location to find nearby blood banks and provide accurate distance information.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "hamara-prayas.HamaraPrayas-build";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		841C09E42E610A61009192C3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2W369JB8XU;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "HamaraPrayas-build-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Hamara Prayas";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "This app needs access to your location to find nearby blood banks and provide accurate distance information.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "This app needs access to your location to find nearby blood banks and provide accurate distance information.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "hamara-prayas.HamaraPrayas-build";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		841C09E62E610A61009192C3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "hamara-prayas.HamaraPrayas-buildTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HamaraPrayas_build.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HamaraPrayas_build";
+			};
+			name = Debug;
+		};
+		841C09E72E610A61009192C3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "hamara-prayas.HamaraPrayas-buildTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HamaraPrayas_build.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/HamaraPrayas_build";
+			};
+			name = Release;
+		};
+		841C09E92E610A61009192C3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "hamara-prayas.HamaraPrayas-buildUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = HamaraPrayas_build;
+			};
+			name = Debug;
+		};
+		841C09EA2E610A61009192C3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "hamara-prayas.HamaraPrayas-buildUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = HamaraPrayas_build;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		841C09BC2E610A5F009192C3 /* Build configuration list for PBXProject "HamaraPrayas_build" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				841C09E02E610A61009192C3 /* Debug */,
+				841C09E12E610A61009192C3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		841C09E22E610A61009192C3 /* Build configuration list for PBXNativeTarget "HamaraPrayas_build" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				841C09E32E610A61009192C3 /* Debug */,
+				841C09E42E610A61009192C3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		841C09E52E610A61009192C3 /* Build configuration list for PBXNativeTarget "HamaraPrayas_buildTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				841C09E62E610A61009192C3 /* Debug */,
+				841C09E72E610A61009192C3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		841C09E82E610A61009192C3 /* Build configuration list for PBXNativeTarget "HamaraPrayas_buildUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				841C09E92E610A61009192C3 /* Debug */,
+				841C09EA2E610A61009192C3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8407ACBB2E678F0D00276808 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.2.0;
+			};
+		};
+		8407ACC82E6791AF00276808 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8407ACBC2E678F0D00276808 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8407ACBB2E678F0D00276808 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		8407ACBE2E678F0D00276808 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8407ACBB2E678F0D00276808 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		8407ACC02E678F0D00276808 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8407ACBB2E678F0D00276808 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		8407ACC22E678F0D00276808 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8407ACBB2E678F0D00276808 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		8407ACC92E6791AF00276808 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8407ACC82E6791AF00276808 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		8407ACCB2E6791AF00276808 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8407ACC82E6791AF00276808 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+		84F404352E74C029002152B0 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FirebaseMessaging;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 841C09B92E610A5F009192C3 /* Project object */;
+}

@@ -1,0 +1,68 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:1.00000,0.26704,0.12489,1.00000",
+      "display-p3:0.41453,0.00000,1.00000,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "blend-mode" : "hard-light",
+      "blur-material" : null,
+      "layers" : [
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "solid" : "display-p3:1.00000,1.00000,1.00000,1.00000"
+              }
+            },
+            {
+              "appearance" : "dark",
+              "value" : "automatic"
+            }
+          ],
+          "glass" : false,
+          "image-name" : "20250903_2341_White Heart Logo_remix_01k48rb1hyfyyvbkh2dcev5gza.png",
+          "name" : "20250903_2341_White Heart Logo_remix_01k48rb1hyfyyvbkh2dcev5gza",
+          "position-specializations" : [
+            {
+              "value" : {
+                "scale" : 1.1,
+                "translation-in-points" : [
+                  -41.3,
+                  -82.90625
+                ]
+              }
+            },
+            {
+              "idiom" : "square",
+              "value" : {
+                "scale" : 1.25,
+                "translation-in-points" : [
+                  -50.390625,
+                  -85.796875
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "lighting" : "individual",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
