@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAuth
 
 struct OfferHelpView: View {
     let helpRequest: HelpRequest
@@ -10,6 +11,7 @@ struct OfferHelpView: View {
     @State private var message: String = ""
     @State private var isSubmitting: Bool = false
     @State private var showSuccessAlert: Bool = false
+    @State private var creditsEarned: Int = 0
     
     var body: some View {
         NavigationView {
@@ -135,12 +137,12 @@ struct OfferHelpView: View {
                     }
                 }
             }
-            .alert("Help Offer Submitted!", isPresented: $showSuccessAlert) {
+            .alert("Help Offer Submitted! 🎉", isPresented: $showSuccessAlert) {
                 Button("OK") {
                     dismiss()
                 }
             } message: {
-                Text("Your help offer has been submitted successfully. The requester will be able to contact you.")
+                Text("Your help offer has been submitted successfully. The requester will be able to contact you.\n\n+\(creditsEarned) Blood Credits earned!")
             }
         }
     }
@@ -154,6 +156,7 @@ struct OfferHelpView: View {
         guard canSubmit else { return }
         
         isSubmitting = true
+        HapticManager.shared.mediumImpact()
         
         Task {
             await viewModel.offerHelp(
@@ -163,9 +166,25 @@ struct OfferHelpView: View {
                 message: message.trimmingCharacters(in: .whitespacesAndNewlines)
             )
             
-            DispatchQueue.main.async {
+            // Award Blood Credits for helping
+            if let userId = Auth.auth().currentUser?.uid {
+                do {
+                    try await BloodCreditsService.shared.recordHelpResponse(
+                        userId: userId,
+                        requestId: helpRequest.id
+                    )
+                    await MainActor.run {
+                        creditsEarned = BloodCreditsService.CreditValues.helpResponse
+                    }
+                } catch {
+                    print("Error recording help response credits: \(error)")
+                }
+            }
+            
+            await MainActor.run {
                 self.isSubmitting = false
                 self.showSuccessAlert = true
+                HapticManager.shared.success()
             }
         }
     }

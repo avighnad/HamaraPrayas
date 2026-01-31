@@ -99,6 +99,24 @@ struct MoreView: View {
                 }
                 
                 
+                Section(header: Text("Rewards")) {
+                    NavigationLink(destination: BloodCreditsView()) {
+                        HStack {
+                            Image(systemName: "star.circle.fill")
+                                .foregroundColor(.red)
+                                .font(.title2)
+                            VStack(alignment: .leading) {
+                                Text("Blood Credits")
+                                    .font(.headline)
+                                Text("Earn rewards for donating blood")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                }
+                
                 Section(header: Text("Account")) {
                     NavigationLink(destination: ProfileView(viewModel: viewModel)) {
                         HStack {
@@ -250,11 +268,58 @@ struct EmergencyRequestCard: View {
 struct ProfileView: View {
     @ObservedObject var viewModel: BloodBankViewModel
     @EnvironmentObject var authService: AuthenticationService
+    @StateObject private var creditsService = BloodCreditsService.shared
     @State private var showingLocationSettings = false
     
     var body: some View {
         NavigationView {
             List {
+                // Blood Credits Section
+                Section {
+                    NavigationLink(destination: BloodCreditsView()) {
+                        HStack(spacing: 16) {
+                            ZStack {
+                                Circle()
+                                    .fill(LinearGradient(
+                                        colors: [.red, .red.opacity(0.7)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ))
+                                    .frame(width: 50, height: 50)
+                                
+                                Image(systemName: "star.fill")
+                                    .foregroundColor(.white)
+                                    .font(.title3)
+                            }
+                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Blood Credits")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                
+                                HStack(spacing: 12) {
+                                    Text("\(creditsService.bloodProfile.totalCredits)")
+                                        .font(.title2.bold())
+                                        .foregroundColor(.red)
+                                    
+                                    Text("•")
+                                        .foregroundColor(.secondary)
+                                    
+                                    Text(creditsService.bloodProfile.priorityLevel.rawValue)
+                                        .font(.caption)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(priorityLevelColor)
+                                }
+                            }
+                            
+                            Spacer()
+                        }
+                        .padding(.vertical, 8)
+                    }
+                } header: {
+                    Text("Rewards")
+                }
+                
                 Section(header: Text("Account")) {
                     HStack {
                         Image(systemName: "person.circle.fill")
@@ -406,6 +471,21 @@ struct ProfileView: View {
             } message: {
                 Text("Please enable location services to find nearby blood banks.")
             }
+            .task {
+                // Load blood credits profile
+                if let userId = Auth.auth().currentUser?.uid {
+                    try? await creditsService.loadBloodProfile(for: userId)
+                }
+            }
+        }
+    }
+    
+    private var priorityLevelColor: Color {
+        switch creditsService.bloodProfile.priorityLevel {
+        case .standard: return .gray
+        case .silver: return .gray
+        case .gold: return .yellow
+        case .platinum: return .purple
         }
     }
 }

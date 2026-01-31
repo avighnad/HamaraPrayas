@@ -220,6 +220,20 @@ struct HelpRequestCard: View {
                                 .foregroundColor(.white)
                             Text("I Can Help")
                                 .fontWeight(.semibold)
+                            
+                            Spacer()
+                            
+                            // Credit indicator
+                            HStack(spacing: 4) {
+                                Image(systemName: "star.fill")
+                                    .font(.caption)
+                                Text("+10")
+                                    .font(.caption.bold())
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(.white.opacity(0.2))
+                            .clipShape(Capsule())
                         }
                         .frame(maxWidth: .infinity)
                         .padding()

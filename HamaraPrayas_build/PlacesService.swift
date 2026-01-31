@@ -24,39 +24,77 @@ class PlacesService: ObservableObject {
         
         print("🔍 Searching for blood banks at location: \(location.latitude), \(location.longitude)")
         
-        // First, fetch verified blood banks from our Firebase database
-        fetchVerifiedBloodBanks(location: location) { [weak self] verifiedBanks in
-            // Then, fetch from OpenStreetMap for additional results
-            self?.fetchOSMBloodBanks(location: location, radius: radius) { osmBanks in
-                DispatchQueue.main.async {
-                    // Combine results: verified first, then OSM results
-                    var allBanks = verifiedBanks
-                    
-                    // Add OSM banks that aren't duplicates of verified ones
-                    for osmBank in osmBanks {
-                        let isDuplicate = verifiedBanks.contains { verified in
-                            // Check if same location (within ~100m) or same name
-                            let distance = self?.calculateDistance(from: verified.location, to: osmBank.location) ?? 0
-                            return distance < 0.1 || verified.name.lowercased() == osmBank.name.lowercased()
-                        }
-                        if !isDuplicate {
-                            allBanks.append(osmBank)
-                        }
-                    }
-                    
-                    // Sort by distance
-                    allBanks.sort { ($0.distance ?? Double.greatestFiniteMagnitude) < ($1.distance ?? Double.greatestFiniteMagnitude) }
-                    
-                    self?.nearbyBloodBanks = allBanks
-                    self?.isLoading = false
-                    
-                    if allBanks.isEmpty {
-                        self?.errorMessage = "No blood banks found in your area"
-                    }
-                    
-                    print("✅ Total blood banks found: \(allBanks.count) (\(verifiedBanks.count) verified, \(osmBanks.count) from OSM)")
+        // Fetch from all sources in parallel, then combine
+        var verifiedBanks: [BloodBank] = []
+        var osmBloodBanks: [BloodBank] = []
+        var hospitalBanks: [BloodBank] = []
+        
+        let group = DispatchGroup()
+        
+        // 1. Fetch verified blood banks from Firebase
+        group.enter()
+        fetchVerifiedBloodBanks(location: location) { banks in
+            verifiedBanks = banks
+            group.leave()
+        }
+        
+        // 2. Fetch dedicated blood banks from OSM
+        group.enter()
+        fetchOSMBloodBanks(location: location, radius: radius) { banks in
+            osmBloodBanks = banks
+            group.leave()
+        }
+        
+        // 3. Always fetch hospitals as backup (they usually have blood banks)
+        group.enter()
+        fetchHospitals(location: location, radius: radius) { banks in
+            hospitalBanks = banks
+            group.leave()
+        }
+        
+        // Combine all results
+        group.notify(queue: .main) { [weak self] in
+            var allBanks: [BloodBank] = []
+            var seenNames = Set<String>()
+            
+            // Add verified banks first (highest priority)
+            for bank in verifiedBanks {
+                allBanks.append(bank)
+                seenNames.insert(bank.name.lowercased())
+            }
+            
+            // Add OSM blood banks (avoid duplicates)
+            for bank in osmBloodBanks {
+                if !seenNames.contains(bank.name.lowercased()) {
+                    allBanks.append(bank)
+                    seenNames.insert(bank.name.lowercased())
                 }
             }
+            
+            // Add hospitals (avoid duplicates)
+            for bank in hospitalBanks {
+                if !seenNames.contains(bank.name.lowercased()) {
+                    allBanks.append(bank)
+                    seenNames.insert(bank.name.lowercased())
+                }
+            }
+            
+            // Sort by: verified first, then by distance
+            allBanks.sort { lhs, rhs in
+                if lhs.isVerified != rhs.isVerified {
+                    return lhs.isVerified
+                }
+                return (lhs.distance ?? Double.greatestFiniteMagnitude) < (rhs.distance ?? Double.greatestFiniteMagnitude)
+            }
+            
+            self?.nearbyBloodBanks = allBanks
+            self?.isLoading = false
+            
+            if allBanks.isEmpty {
+                self?.errorMessage = "No blood banks found in your area. Try increasing the search radius."
+            }
+            
+            print("✅ Total results: \(allBanks.count) (\(verifiedBanks.count) verified, \(osmBloodBanks.count) blood banks, \(hospitalBanks.count) hospitals)")
         }
     }
     
@@ -131,7 +169,7 @@ class PlacesService: ObservableObject {
     private func fetchOSMBloodBanks(location: CLLocationCoordinate2D, radius: Double, completion: @escaping ([BloodBank]) -> Void) {
         print("🌐 Fetching blood banks from OpenStreetMap...")
         
-        // IMPROVED QUERY: Search specifically for blood banks and blood donation centers
+        // Search specifically for blood banks and blood donation centers
         let query = """
         [out:json][timeout:30];
         (
@@ -159,13 +197,13 @@ class PlacesService: ObservableObject {
         let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             if let error = error {
                 print("❌ OSM network error: \(error.localizedDescription)")
-                self?.fetchHospitalsAsFallback(location: location, radius: radius, completion: completion)
+                completion([])
                 return
             }
             
             guard let data = data else {
                 print("❌ No OSM data received")
-                self?.fetchHospitalsAsFallback(location: location, radius: radius, completion: completion)
+                completion([])
                 return
             }
             
@@ -174,31 +212,23 @@ class PlacesService: ObservableObject {
                 print("🔍 OSM returned \(overpassResponse.elements.count) blood bank elements")
                 
                 let bloodBanks = overpassResponse.elements.compactMap { element -> BloodBank? in
-                    self?.convertOverpassElementToBloodBank(element, userLocation: location, isVerified: false)
+                    self?.convertOverpassElementToBloodBank(element, userLocation: location, isVerified: false, isBloodBank: true)
                 }
                 
-                if bloodBanks.isEmpty {
-                    print("⚠️ No blood banks found in OSM, trying hospital fallback...")
-                    self?.fetchHospitalsAsFallback(location: location, radius: radius, completion: completion)
-                } else {
-                    DispatchQueue.main.async {
-                        completion(bloodBanks)
-                    }
-                }
+                completion(bloodBanks)
             } catch {
                 print("❌ Error parsing OSM data: \(error.localizedDescription)")
-                self?.fetchHospitalsAsFallback(location: location, radius: radius, completion: completion)
+                completion([])
             }
         }
         
         task.resume()
     }
     
-    // MARK: - Fallback: Search for Major Hospitals (likely to have blood banks)
-    private func fetchHospitalsAsFallback(location: CLLocationCoordinate2D, radius: Double, completion: @escaping ([BloodBank]) -> Void) {
-        print("🏥 Falling back to major hospitals search...")
+    // MARK: - Fetch Hospitals (they usually have blood banks)
+    private func fetchHospitals(location: CLLocationCoordinate2D, radius: Double, completion: @escaping ([BloodBank]) -> Void) {
+        print("🏥 Fetching hospitals...")
         
-        // Search for major hospitals that likely have blood banks
         let query = """
         [out:json][timeout:30];
         (
@@ -212,40 +242,31 @@ class PlacesService: ObservableObject {
         let urlString = "https://overpass-api.de/api/interpreter?data=\(encodedQuery)"
         
         guard let url = URL(string: urlString) else {
-            DispatchQueue.main.async {
-                completion([])
-            }
+            completion([])
             return
         }
         
         let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
             guard let data = data, error == nil else {
-                DispatchQueue.main.async {
-                    completion([])
-                }
+                completion([])
                 return
             }
             
             do {
                 let overpassResponse = try JSONDecoder().decode(OverpassResponse.self, from: data)
                 
-                // Only include named hospitals
                 let bloodBanks = overpassResponse.elements.compactMap { element -> BloodBank? in
                     guard element.tags?.amenity == "hospital",
                           element.tags?.name != nil else {
                         return nil
                     }
-                    return self?.convertOverpassElementToBloodBank(element, userLocation: location, isVerified: false)
+                    return self?.convertOverpassElementToBloodBank(element, userLocation: location, isVerified: false, isBloodBank: false)
                 }
                 
-                print("🏥 Found \(bloodBanks.count) hospitals as fallback")
-                DispatchQueue.main.async {
-                    completion(bloodBanks)
-                }
+                print("🏥 Found \(bloodBanks.count) hospitals")
+                completion(bloodBanks)
             } catch {
-                DispatchQueue.main.async {
-                    completion([])
-                }
+                completion([])
             }
         }
         
@@ -253,7 +274,7 @@ class PlacesService: ObservableObject {
     }
     
     // MARK: - Convert OSM Element to BloodBank
-    private func convertOverpassElementToBloodBank(_ element: OverpassElement, userLocation: CLLocationCoordinate2D, isVerified: Bool) -> BloodBank? {
+    private func convertOverpassElementToBloodBank(_ element: OverpassElement, userLocation: CLLocationCoordinate2D, isVerified: Bool, isBloodBank: Bool = true) -> BloodBank? {
         guard let lat = element.lat, let lon = element.lon else {
             print("❌ Element missing lat/lon: \(element.id)")
             return nil
@@ -263,9 +284,14 @@ class PlacesService: ObservableObject {
         let address = buildFullAddress(from: element.tags)
         let phone = element.tags?.phone ?? element.tags?.contact_phone ?? "Contact facility directly"
         
-        // Determine facility type and format display name
-        let facilityType = element.tags?.healthcare ?? element.tags?.amenity ?? "blood_bank"
-        let displayName = formatDisplayName(name: name, facilityType: facilityType)
+        // Format display name based on whether it's a dedicated blood bank or hospital
+        let displayName: String
+        if isBloodBank {
+            displayName = name
+        } else {
+            // It's a hospital - add indicator that it may have blood bank
+            displayName = name.lowercased().contains("blood") ? name : "\(name) - Blood Bank"
+        }
         
         let bankLocation = CLLocationCoordinate2D(latitude: lat, longitude: lon)
         let distance = calculateDistance(from: userLocation, to: bankLocation)

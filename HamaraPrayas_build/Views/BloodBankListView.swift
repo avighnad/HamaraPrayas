@@ -410,7 +410,7 @@ struct BloodBankInfoView: View {
                         InfoSection(
                             icon: "checkmark.seal.fill",
                             title: "Verified Blood Banks",
-                            description: "Look for the blue 'Verified' badge! These are confirmed blood banks in our database. Other results are from OpenStreetMap and may include hospitals with blood bank facilities."
+                            description: "Look for the blue 'Verified' badge on confirmed blood banks. Hospitals with '- Blood Bank' suffix are major hospitals that typically have blood bank facilities - call to confirm."
                         )
                         
                         InfoSection(
