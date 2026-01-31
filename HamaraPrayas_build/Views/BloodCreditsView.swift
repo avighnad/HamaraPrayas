@@ -97,13 +97,16 @@ struct BloodCreditsView: View {
                 showNewBadgeAlert = true
             }
         }
-            .task {
-                if let userId = Auth.auth().currentUser?.uid {
-                    try? await creditsService.loadBloodProfile(for: userId)
-                    try? await creditsService.loadLeaderboard()
-                }
+        .task {
+            if let userId = Auth.auth().currentUser?.uid {
+                try? await creditsService.loadBloodProfile(for: userId)
+                try? await creditsService.loadLeaderboard()
             }
-
+        }
+    }
+    
+    // MARK: - Credit Card View
+    private var creditCardView: some View {
         VStack(spacing: 0) {
             // Main card
             VStack(spacing: 16) {
