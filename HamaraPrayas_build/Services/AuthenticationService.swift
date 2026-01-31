@@ -46,6 +46,12 @@ class AuthenticationService: ObservableObject {
         }
     }
     
+    // MARK: - Public method to load existing user (called on app launch)
+    func loadExistingUser(userId: String) {
+        print("🔄 Loading existing user on app launch: \(userId)")
+        loadUserFromFirestore(userId: userId)
+    }
+    
     // MARK: - Authentication Methods
     
     func login(email: String, password: String) async {
